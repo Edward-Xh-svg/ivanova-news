@@ -1,0 +1,12 @@
+{
+  "name": "news-ivanova",
+  "version": "1.0.0",
+  "description": "The official News and Media platform for Ivanova (Manlines)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
