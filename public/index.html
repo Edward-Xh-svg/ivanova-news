@@ -74,7 +74,6 @@
     </header>
 
     <main class="news-container">
-        
         <div id="devPanel" class="dev-tools">
             <h3 style="margin-top: 0; color: #e74c3c;"><i class="fa-solid fa-pen-nib"></i> مركز التحرير (صلاحيات المطور)</h3>
             <input type="text" id="newsTitle" placeholder="عنوان الخبر الرئيسي">
@@ -98,10 +97,8 @@
     </footer>
 
     <script>
-        // رابط الـ Worker الخاص بك
         const WORKER_URL = "https://ivanova-news-api.vladimirachraf3.workers.dev";
 
-        // 1. نظام إظهار/إخفاء القائمة العلوية
         function toggleAppsMenu() { document.getElementById('appsDropdown').classList.toggle('active'); }
         window.onclick = function(event) {
             if (!event.target.matches('.apps-menu-btn') && !event.target.closest('.apps-dropdown')) {
@@ -109,7 +106,6 @@
             }
         }
 
-        // 2. جلب الأخبار من قاعدة البيانات
         async function fetchNews() {
             try {
                 const res = await fetch(`${WORKER_URL}/api/news`);
@@ -133,11 +129,10 @@
                 });
                 checkDevStatus();
             } catch (e) {
-                document.getElementById('newsFeed').innerHTML = '<div class="loading-text" style="color:#e74c3c;">تعذر الاتصال بخوادم Ivanova.</div>';
+                document.getElementById('newsFeed').innerHTML = '<div class="loading-text" style="color:#e74c3c;">خطأ في جلب البيانات من المورد.</div>';
             }
         }
 
-        // 3. نظام التوثيق المخفي
         async function showLoginPrompt() {
             const username = prompt("معرف المطور:");
             if (!username) return;
@@ -147,6 +142,7 @@
             try {
                 const res = await fetch(`${WORKER_URL}/api/login`, {
                     method: 'POST',
+                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, pass_code })
                 });
@@ -155,58 +151,59 @@
                     localStorage.setItem('grosmen_dev', username);
                     location.reload();
                 } else {
-                    alert("تم رفض الوصول. البيانات غير مطابقة لقاعدة D1.");
+                    alert("بيانات الدخول غير صحيحة.");
                 }
             } catch (e) {
-                alert("خطأ في الاتصال بالبوابة.");
+                alert("فشل في تجاوز جدار حماية البوابة (CORS Error). تأكد من تحديث الـ Worker.");
             }
         }
 
-        // 4. النشر
         async function publishNews() {
             const title = document.getElementById('newsTitle').value;
             const content = document.getElementById('newsContent').value;
             const image_url = document.getElementById('newsImage').value;
             const author = localStorage.getItem('grosmen_dev');
 
-            if (!title || !content) return alert("البيانات غير مكتملة!");
+            if (!title || !content) return alert("املأ الفراغات!");
 
-            await fetch(`${WORKER_URL}/api/news/add`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content, image_url, author })
-            });
-            location.reload();
-        }
-
-        // 5. الحذف
-        async function deleteNews(id) {
-            if(confirm("هل تريد إزالة هذا الخبر نهائياً من الشبكة؟")) {
-                await fetch(`${WORKER_URL}/api/news/delete`, {
-                    method: 'DELETE',
+            try {
+                await fetch(`${WORKER_URL}/api/news/add`, {
+                    method: 'POST',
+                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id })
+                    body: JSON.stringify({ title, content, image_url, author })
                 });
                 location.reload();
+            } catch (e) {
+                alert("خطأ أثناء النشر.");
             }
         }
 
-        // 6. التحقق من حالة المطور
+        async function deleteNews(id) {
+            if(confirm("حذف نهائي؟")) {
+                try {
+                    await fetch(`${WORKER_URL}/api/news/delete`, {
+                        method: 'DELETE',
+                        mode: 'cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id })
+                    });
+                    location.reload();
+                } catch (e) {
+                    alert("خطأ أثناء الحذف.");
+                }
+            }
+        }
+
         function checkDevStatus() {
-            const dev = localStorage.getItem('grosmen_dev');
-            if (dev) {
+            if (localStorage.getItem('grosmen_dev')) {
                 document.getElementById('devPanel').style.display = 'block';
                 document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
             }
         }
 
-        // 7. تسجيل الخروج
-        function logout() {
-            localStorage.removeItem('grosmen_dev');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('grosmen_dev'); location.reload(); }
 
-        // تشغيل جلب الأخبار فور فتح الصفحة
         fetchNews();
     </script>
 </body>
