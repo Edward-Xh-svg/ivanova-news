@@ -3,22 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Grosmen News | الاخبار الدولية</title>
+<title>Grosmen News</title>
 
 <link rel="icon" href="news-faivcon.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
 <style>
 body{
   margin:0;
-  font-family:'Cairo',sans-serif;
+  font-family:'Cairo';
   background:#050505;
   color:white;
-  min-height:100vh;
 }
 
 /* HEADER */
@@ -26,130 +23,96 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:15px 30px;
+  padding:15px 25px;
   position:sticky;
   top:0;
   background:rgba(0,0,0,0.6);
   backdrop-filter:blur(10px);
-  z-index:1000;
 }
 
-.header-logo{
-  width:150px;
-}
-
-/* APPS MENU */
+/* MENU ICON */
 .apps-menu-btn{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(3,5px);
   gap:4px;
   cursor:pointer;
-  padding:10px;
 }
-
 .dot{
-  width:5px;
-  height:5px;
+  width:5px;height:5px;
   background:white;
   border-radius:50%;
 }
 
+/* DROPDOWN */
 .apps-dropdown{
   position:absolute;
   top:70px;
   left:20px;
-  background:#0a0a0a;
-  border:1px solid #222;
-  border-radius:15px;
-  padding:20px;
+  background:#111;
+  border:1px solid #333;
+  padding:15px;
+  border-radius:12px;
   display:none;
   grid-template-columns:repeat(3,1fr);
-  gap:15px;
+  gap:10px;
+  z-index:999;
 }
-
-.apps-dropdown.active{
-  display:grid;
-}
+.apps-dropdown.active{display:grid;}
 
 .app-item{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  text-align:center;
+  font-size:12px;
   color:white;
   text-decoration:none;
-  font-size:12px;
 }
-
 .app-item img{
-  width:50px;
-  height:50px;
-}
-
-/* MAIN */
-.news-container{
-  max-width:800px;
-  margin:40px auto;
-  padding:0 20px;
+  width:55px;
+  height:55px;
+  margin-bottom:5px;
 }
 
 /* NEWS */
+.news-container{
+  max-width:800px;
+  margin:auto;
+  padding:20px;
+}
+
 .news-card{
-  background:#0c0c0c;
-  padding:20px;
-  margin-bottom:20px;
-  border-radius:12px;
-  border:1px solid #222;
-}
-
-.news-card img{
-  max-width:100%;
-  border-radius:10px;
-}
-
-/* DEV */
-.dev-tools{
   background:#111;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:20px;
-}
-
-input,textarea{
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  background:#000;
-  border:1px solid #333;
-  color:white;
-  border-radius:8px;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
 }
 
 /* LOGIN */
 .login-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.8);
-  backdrop-filter:blur(10px);
+  background:rgba(0,0,0,0.85);
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:9999;
 }
-
 .login-box{
-  width:320px;
   background:#111;
-  padding:25px;
-  border-radius:15px;
-  border:1px solid #333;
+  padding:20px;
+  border-radius:12px;
+  width:300px;
 }
-
+input,textarea{
+  width:100%;
+  margin:5px 0;
+  padding:8px;
+  background:#000;
+  border:1px solid #333;
+  color:white;
+}
 button{
-  padding:10px;
+  padding:8px;
   background:#e74c3c;
   border:none;
   color:white;
-  border-radius:8px;
   cursor:pointer;
 }
 </style>
@@ -163,82 +126,82 @@ button{
 <!-- HEADER -->
 <header class="main-header">
 
-<!-- APPS -->
-<div class="apps-menu-btn" onclick="toggleAppsMenu()">
-  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+<!-- MENU (رجعت نفس التصميم + الروابط الأصلية) -->
+<div>
+  <div class="apps-menu-btn" @click="menu=!menu">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <div class="apps-dropdown" :class="{active:menu}">
+
+    <a href="https://bacmaroc.ivanova.sbs" class="app-item">
+      <img src="bacmaroc-ovcon.png">
+      <div>Bac Maroc</div>
+    </a>
+
+    <a href="https://courses.ivanova.sbs" class="app-item">
+      <img src="courses-ovcon.png">
+      <div>Courses</div>
+    </a>
+
+    <a href="https://wikijobs.ivanova.sbs" class="app-item">
+      <img src="wikijobs-ovcon.png">
+      <div>WikiJobs</div>
+    </a>
+
+    <a href="https://store.ivanova.sbs" class="app-item">
+      <img src="store-ovcon.png">
+      <div>Store</div>
+    </a>
+
+    <a href="javascript:location.reload()" class="app-item">
+      <img src="news-ovcon.png">
+      <div>News</div>
+    </a>
+
+  </div>
 </div>
 
-<img class="header-logo" src="grosmen-fivcon.png">
+<h3>Grosmen News</h3>
 
-<button v-if="!dev" @click="login.show=true">دخول</button>
+<button v-if="!dev" @click="login=true">دخول</button>
 <button v-else @click="logout">خروج</button>
 
 </header>
 
-<!-- APPS DROPDOWN -->
-<div class="apps-dropdown" id="appsDropdown">
-  <a class="app-item" href="https://bacmaroc.ivanova.sbs">
-    <img src="bacmaroc-ovcon.png"><span>Bac Maroc</span>
-  </a>
-
-  <a class="app-item" href="https://courses.ivanova.sbs">
-    <img src="courses-ovcon.png"><span>Courses</span>
-  </a>
-
-  <a class="app-item" href="https://wikijobs.ivanova.sbs">
-    <img src="wikijobs-ovcon.png"><span>WikiJobs</span>
-  </a>
-
-  <a class="app-item" href="https://store.ivanova.sbs">
-    <img src="store-ovcon.png"><span>Store</span>
-  </a>
-
-  <a class="app-item">
-    <img src="news-ovcon.png"><span>News</span>
-  </a>
-</div>
-
 <!-- LOGIN -->
-<div v-if="login.show" class="login-overlay">
+<div v-if="login" class="login-overlay">
   <div class="login-box">
     <h3>تسجيل دخول</h3>
 
-    <input v-model="login.username" placeholder="username">
-    <input v-model="login.pass_code" type="password" placeholder="password">
+    <input v-model="user" placeholder="username">
+    <input v-model="pass" type="password" placeholder="pass_code">
 
-    <p style="color:red" v-if="login.error">{{login.error}}</p>
+    <p style="color:red" v-if="error">{{error}}</p>
 
     <button @click="doLogin">دخول</button>
-    <button @click="login.show=false" style="background:#333;margin-top:10px">إغلاق</button>
+    <button @click="login=false" style="background:#333;margin-top:5px">إغلاق</button>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- NEWS -->
 <main class="news-container">
 
-<!-- DEV -->
-<div v-if="dev" class="dev-tools">
-  <h3>لوحة التحرير</h3>
-
-  <input id="title" placeholder="عنوان">
-  <input id="image" placeholder="صورة">
-  <textarea id="content" placeholder="محتوى"></textarea>
-
+<div v-if="dev">
+  <h3>لوحة المطور</h3>
+  <input v-model="title" placeholder="عنوان">
+  <input v-model="image" placeholder="صورة">
+  <textarea v-model="content" placeholder="محتوى"></textarea>
   <button @click="publish">نشر</button>
 </div>
 
-<!-- NEWS -->
-<div v-if="loading">جاري التحميل...</div>
-
 <div v-for="n in news" class="news-card">
-  <img v-if="n.image_url" :src="n.image_url">
-  <h2>{{n.title}}</h2>
+  <img v-if="n.image_url" :src="n.image_url" style="width:100%">
+  <h3>{{n.title}}</h3>
   <p>{{n.content}}</p>
   <small>{{n.author_name}}</small>
-
-  <button v-if="dev" @click="remove(n.id)">حذف</button>
 </div>
 
 </main>
@@ -246,45 +209,47 @@ button{
 </div>
 
 <script>
-const { createApp } = Vue;
+const app = Vue.createApp({
 
-createApp({
 data(){
 return{
-  WORKER_URL:"https://ivanova-news.vladimirachraf3.workers.dev",
+  WORKER:"https://ivanova-news.vladimirachraf3.workers.dev",
 
-  news:[],
-  loading:true,
+  menu:false,
 
-  dev:localStorage.getItem("grosmen_dev"),
+  login:false,
+  user:"",
+  pass:"",
+  error:"",
 
-  login:{
-    show:false,
-    username:"",
-    pass_code:"",
-    error:""
-  }
+  dev:localStorage.getItem("dev"),
+
+  title:"",
+  image:"",
+  content:"",
+
+  news:[]
 }
 },
 
 mounted(){
-this.fetchNews();
+this.load();
 },
 
 methods:{
 
-async api(path,options={}){
-  const r = await fetch(this.WORKER_URL+path,{
+async api(url,options={}){
+  const r = await fetch(this.WORKER+url,{
     headers:{"Content-Type":"application/json"},
     ...options
   });
+
   if(!r.ok) throw new Error();
   return await r.json();
 },
 
-async fetchNews(){
+async load(){
   this.news = await this.api("/api/news");
-  this.loading=false;
 },
 
 async doLogin(){
@@ -292,22 +257,22 @@ async doLogin(){
     await this.api("/api/login",{
       method:"POST",
       body:JSON.stringify({
-        username:this.login.username,
-        pass_code:this.login.pass_code
+        username:this.user,
+        pass_code:this.pass
       })
     });
 
-    localStorage.setItem("grosmen_dev",this.login.username);
-    this.dev=this.login.username;
-    this.login.show=false;
+    localStorage.setItem("dev",this.user);
+    this.dev=this.user;
+    this.login=false;
 
   }catch{
-    this.login.error="خطأ في البيانات";
+    this.error="خطأ في البيانات";
   }
 },
 
 logout(){
-  localStorage.removeItem("grosmen_dev");
+  localStorage.removeItem("dev");
   this.dev=null;
 },
 
@@ -315,39 +280,19 @@ async publish(){
   await this.api("/api/news/add",{
     method:"POST",
     body:JSON.stringify({
-      title:document.getElementById("title").value,
-      content:document.getElementById("content").value,
-      image_url:document.getElementById("image").value,
+      title:this.title,
+      content:this.content,
+      image_url:this.image,
       author:this.dev
     })
   });
 
-  this.fetchNews();
-},
-
-async remove(id){
-  await this.api("/api/news/delete",{
-    method:"DELETE",
-    body:JSON.stringify({id})
-  });
-
-  this.fetchNews();
+  this.load();
 }
 
 }
 
 }).mount("#app");
-
-/* APPS MENU */
-function toggleAppsMenu(){
-  document.getElementById("appsDropdown").classList.toggle("active");
-}
-
-window.onclick=function(e){
-  if(!e.target.closest(".apps-menu-btn") && !e.target.closest(".apps-dropdown")){
-    document.getElementById("appsDropdown").classList.remove("active");
-  }
-}
 </script>
 
 </body>
