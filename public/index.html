@@ -238,56 +238,88 @@ this.load();
 
 methods:{
 
-async api(url,options={}){
-  const r = await fetch(this.WORKER+url,{
-    headers:{"Content-Type":"application/json"},
-    ...options
-  });
+async api(url, options = {}) {
+  try {
+    const r = await fetch(this.WORKER + url, {
+      method: options.method || "GET",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: options.body || undefined
+    });
 
-  if(!r.ok) throw new Error();
-  return await r.json();
+    const text = await r.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON from server: " + text);
+    }
+
+    if (!r.ok) {
+      throw new Error(data.error || "Request failed");
+    }
+
+    return data;
+
+  } catch (err) {
+    console.error("API ERROR:", err);
+    throw err;
+  }
 },
 
 async load(){
-  this.news = await this.api("/api/news");
+  try{
+    this.news = await this.api("/api/news");
+  }catch(e){
+    console.log(e);
+  }
 },
 
 async doLogin(){
   try{
     await this.api("/api/login",{
       method:"POST",
-      body:JSON.stringify({
-        username:this.user,
-        pass_code:this.pass
+      body: JSON.stringify({
+        username: this.user.trim(),
+        pass_code: this.pass.trim()
       })
     });
 
-    localStorage.setItem("dev",this.user);
-    this.dev=this.user;
-    this.login=false;
+    localStorage.setItem("dev", this.user.trim());
+    this.dev = this.user.trim();
+    this.login = false;
+    this.error = "";
 
-  }catch{
-    this.error="خطأ في البيانات";
+  }catch(e){
+    this.error = "خطأ في البيانات";
+    console.log(e);
   }
 },
 
 logout(){
   localStorage.removeItem("dev");
-  this.dev=null;
+  this.dev = null;
 },
 
 async publish(){
-  await this.api("/api/news/add",{
-    method:"POST",
-    body:JSON.stringify({
-      title:this.title,
-      content:this.content,
-      image_url:this.image,
-      author:this.dev
-    })
-  });
+  try{
+    await this.api("/api/news/add",{
+      method:"POST",
+      body: JSON.stringify({
+        title:this.title,
+        content:this.content,
+        image_url:this.image,
+        author:this.dev
+      })
+    });
 
-  this.load();
+    this.load();
+
+  }catch(e){
+    console.log(e);
+  }
 }
 
 }
