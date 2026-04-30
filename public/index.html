@@ -1,251 +1,284 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grosmen News | الاخبار الدولية</title>
-    <link rel="icon" href="news-faivcon.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { background-color: #050505; color: white; font-family: 'Cairo', sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .glass-effect { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; position: sticky; top: 0; z-index: 1000; }
-        .header-logo { width: 160px; height: auto; }
-        
-        /* مربع الاختصارات */
-        .apps-menu-btn { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; cursor: pointer; padding: 10px; }
-        .dot { width: 5px; height: 5px; background: white; border-radius: 50%; }
-        .apps-dropdown {
-            position: absolute; top: 75px; left: 20px; background: rgba(10, 10, 10, 0.98); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 25px; 
-            display: none; grid-template-columns: repeat(3, 1fr); gap: 20px; z-index: 1000;
-        }
-        .apps-dropdown.active { display: grid; }
-        .app-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; font-size: 13px; padding: 15px; border-radius: 12px; transition: 0.3s; }
-        .app-item:hover { background: rgba(255,255,255,0.08); }
-        .app-item img { width: 55px; height: 55px; margin-bottom: 10px; }
-        .current-app { background: rgba(128, 128, 128, 0.2); border: 1px solid rgba(255,255,255,0.1); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grosmen News | الاخبار الدولية</title>
 
-        /* ستايل الأخبار ولوحة المطور */
-        .news-container { flex: 1; max-width: 800px; margin: 40px auto; padding: 0 20px; width: 100%; box-sizing: border-box; }
-        
-        .dev-tools { display: none; background: #0a0a0a; padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .dev-tools input, .dev-tools textarea { width: 100%; background: #050505; border: 1px solid #333; color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; font-family: 'Cairo', sans-serif; box-sizing: border-box; }
-        .dev-tools input:focus, .dev-tools textarea:focus { outline: none; border-color: #e74c3c; }
-        .dev-btn { background: #e74c3c; color: white; border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 800; transition: 0.3s; }
-        .dev-btn:hover { background: #c0392b; }
+<link rel="icon" href="news-faivcon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-        .news-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; transition: 0.3s; }
-        .news-card:hover { background: rgba(255,255,255,0.04); }
-        .news-card img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; display: block; }
-        .news-card h2 { margin-top: 0; color: #fff; font-size: 1.5rem; margin-bottom: 10px; }
-        .news-card p { color: #bbb; line-height: 1.8; margin-bottom: 20px; }
-        .news-meta { color: #666; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; }
-        
-        .delete-btn { position: absolute; top: 20px; left: 20px; background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; padding: 5px 15px; border-radius: 5px; cursor: pointer; display: none; font-family: 'Cairo'; transition: 0.3s; }
-        .delete-btn:hover { background: #e74c3c; color: white; }
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
-        .loading-text { text-align: center; color: #888; margin-top: 50px; font-size: 1.2rem; }
+<style>
+body{
+  margin:0;
+  font-family:'Cairo',sans-serif;
+  background:#050505;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
 
-        footer { background: #0a0a0a; padding: 40px 20px; border-top: 1px solid #222; text-align: center; margin-top: auto; }
-        .footer-emails { color: #fff; margin-bottom: 10px; font-size: 0.9rem; }
-        .secret-icon { cursor: pointer; opacity: 0.1; transition: 0.3s; display: inline-block; margin-top: 15px; font-size: 18px; }
-        .secret-icon:hover { opacity: 1; color: #e74c3c; }
-    </style>
+.glass-effect{
+  background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.main-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 30px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.header-logo{width:150px}
+
+/* News */
+.news-container{
+  max-width:800px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+.news-card{
+  background:rgba(255,255,255,0.02);
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.05);
+}
+
+.news-card img{
+  max-width:100%;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+/* Dev */
+.dev-tools{
+  display:block;
+  background:#0a0a0a;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  border:1px solid #222;
+}
+
+input,textarea{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  background:#000;
+  border:1px solid #333;
+  color:white;
+  border-radius:8px;
+}
+
+/* Login */
+.login-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  backdrop-filter:blur(10px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.login-box{
+  width:320px;
+  background:#111;
+  padding:25px;
+  border-radius:15px;
+  border:1px solid #333;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  background:#e74c3c;
+  color:white;
+}
+</style>
+
 </head>
+
 <body>
-    <header class="main-header glass-effect">
-        <div class="apps-menu-btn" onclick="toggleAppsMenu()">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="logo-area">
-            <img src="grosmen-fivcon.png" alt="Grosmen Logo" class="header-logo">
-        </div>
-        <div class="apps-dropdown" id="appsDropdown">
-            <a href="https://bacmaroc.ivanova.sbs" class="app-item"><img src="bacmaroc-ovcon.png"><span>Bac Maroc</span></a>
-            <a href="https://courses.ivanova.sbs" class="app-item"><img src="courses-ovcon.png"><span>Courses</span></a>
-            <a href="https://wikijobs.ivanova.sbs" class="app-item"><img src="wikijobs-ovcon.png"><span>WikiJobs</span></a>
-            <a href="https://store.ivanova.sbs" class="app-item"><img src="store-ovcon.png"><span>Store</span></a>
-            <a href="javascript:location.reload();" class="app-item current-app"><img src="news-ovcon.png"><span>News</span></a>
-        </div>
-    </header>
 
-    <main class="news-container">
-        <div id="devPanel" class="dev-tools">
-            <h3 style="margin-top: 0; color: #e74c3c;"><i class="fa-solid fa-pen-nib"></i> مركز التحرير (صلاحيات المطور)</h3>
-            <input type="text" id="newsTitle" placeholder="عنوان الخبر الرئيسي">
-            <input type="text" id="newsImage" placeholder="رابط الصورة (URL) - اختياري">
-            <textarea id="newsContent" rows="6" placeholder="محتوى الخبر أو المقال..."></textarea>
-            <button class="dev-btn" onclick="publishNews()">نشر المقال</button>
-            <button class="dev-btn" onclick="logout()" style="background: transparent; border: 1px solid #555; color: #aaa; margin-right: 10px;">تسجيل الخروج</button>
-        </div>
+<div id="app">
 
-        <div id="newsFeed">
-            <div class="loading-text"><i class="fa-solid fa-circle-notch fa-spin"></i> جاري مزامنة أحدث الأخبار...</div>
-        </div>
-    </main>
+<!-- HEADER -->
+<header class="main-header glass-effect">
+  <img class="header-logo" src="grosmen-fivcon.png">
 
-    <footer>
-        <div class="footer-emails">
-            دعم العملاء: support@ivanova.sbs | الإدارة العامة: ceo@ivanova.sbs
-        </div>
-        <p style="color: #555; font-size: 0.8rem; margin-bottom: 0;">&copy; 2026 Grosmen World & Ivanova Platform.</p>
-        <div class="secret-icon" onclick="showLoginPrompt()">⚡</div>
-    </footer>
+  <button v-if="!dev" @click="login.show=true">
+    دخول
+  </button>
 
-       <script>
-const WORKER_URL = "https://ivanova-news-api.vladimirachraf3.workers.dev";
+  <button v-else @click="logout">
+    خروج
+  </button>
+</header>
 
-function toggleAppsMenu() {
-    document.getElementById('appsDropdown').classList.toggle('active');
+<!-- LOGIN -->
+<div v-if="login.show" class="login-overlay">
+  <div class="login-box">
+    <h3>تسجيل دخول المطور</h3>
+
+    <input v-model="login.username" placeholder="username">
+    <input v-model="login.pass_code" placeholder="password" type="password">
+
+    <p style="color:#ff5555" v-if="login.error">{{login.error}}</p>
+
+    <button @click="doLogin">دخول</button>
+    <button @click="login.show=false" style="background:#333">إغلاق</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="news-container">
+
+<!-- DEV PANEL -->
+<div v-if="dev" class="dev-tools">
+  <h3>لوحة التحرير</h3>
+
+  <input id="title" placeholder="عنوان">
+  <input id="image" placeholder="صورة">
+  <textarea id="content" placeholder="محتوى"></textarea>
+
+  <button @click="publish">نشر</button>
+</div>
+
+<!-- NEWS -->
+<div v-if="loading">جاري التحميل...</div>
+
+<div v-for="n in news" class="news-card">
+  <img v-if="n.image_url" :src="n.image_url">
+  <h2>{{n.title}}</h2>
+  <p>{{n.content}}</p>
+
+  <small>✍ {{n.author_name}}</small>
+
+  <button v-if="dev" @click="remove(n.id)">
+    حذف
+  </button>
+</div>
+
+</main>
+
+</div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+data(){
+return{
+  WORKER_URL:"https://ivanova-news.vladimirachraf3.workers.dev",
+
+  news:[],
+  loading:true,
+
+  dev:localStorage.getItem("grosmen_dev"),
+
+  login:{
+    show:false,
+    username:"",
+    pass_code:"",
+    error:""
+  }
+}
+},
+
+mounted(){
+this.fetchNews();
+},
+
+methods:{
+
+async api(path,options={}){
+  const r = await fetch(this.WORKER_URL+path,{
+    headers:{"Content-Type":"application/json"},
+    ...options
+  });
+
+  if(!r.ok) throw new Error();
+  return await r.json();
+},
+
+async fetchNews(){
+  try{
+    this.news = await this.api("/api/news");
+  }catch(e){
+    console.log(e);
+  }
+  this.loading=false;
+},
+
+async doLogin(){
+  try{
+    await this.api("/api/login",{
+      method:"POST",
+      body:JSON.stringify({
+        username:this.login.username,
+        pass_code:this.login.pass_code
+      })
+    });
+
+    localStorage.setItem("grosmen_dev",this.login.username);
+    this.dev=this.login.username;
+    this.login.show=false;
+
+  }catch{
+    this.login.error="خطأ في البيانات";
+  }
+},
+
+logout(){
+  localStorage.removeItem("grosmen_dev");
+  this.dev=null;
+},
+
+async publish(){
+  await this.api("/api/news/add",{
+    method:"POST",
+    body:JSON.stringify({
+      title:document.getElementById("title").value,
+      content:document.getElementById("content").value,
+      image_url:document.getElementById("image").value,
+      author:this.dev
+    })
+  });
+
+  this.fetchNews();
+},
+
+async remove(id){
+  await this.api("/api/news/delete",{
+    method:"DELETE",
+    body:JSON.stringify({id})
+  });
+
+  this.fetchNews();
 }
 
-window.onclick = function(event) {
-    if (!event.target.matches('.apps-menu-btn') && !event.target.closest('.apps-dropdown')) {
-        document.getElementById('appsDropdown').classList.remove('active');
-    }
 }
 
-// 🧠 دالة موحدة للطلبات
-async function apiFetch(path, options = {}) {
-    try {
-        const res = await fetch(`${WORKER_URL}${path}`, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {})
-            }
-        });
-
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`HTTP ${res.status}: ${text}`);
-        }
-
-        return await res.json();
-
-    } catch (err) {
-        console.error("API Error:", err);
-        throw err;
-    }
-}
-
-// 📥 جلب الأخبار
-async function fetchNews() {
-    try {
-        const data = await apiFetch("/api/news");
-
-        const feed = document.getElementById('newsFeed');
-        feed.innerHTML = data.length 
-            ? '' 
-            : '<div class="loading-text">لا توجد أخبار حالياً.</div>';
-
-        data.forEach(item => {
-            feed.innerHTML += `
-                <div class="news-card">
-                    <button class="delete-btn" onclick="deleteNews(${item.id})">
-                        <i class="fa-solid fa-trash"></i> حذف
-                    </button>
-                    ${item.image_url ? `<img src="${item.image_url}" onerror="this.style.display='none'">` : ''}
-                    <h2>${item.title}</h2>
-                    <p>${item.content}</p>
-                    <div class="news-meta">
-                        <i class="fa-solid fa-user-pen"></i> ${item.author_name}
-                        &nbsp;|&nbsp;
-                        <i class="fa-regular fa-clock"></i> 
-                        ${new Date(item.created_at).toLocaleString('ar-MA')}
-                    </div>
-                </div>
-            `;
-        });
-
-        checkDevStatus();
-
-    } catch (e) {
-        document.getElementById('newsFeed').innerHTML =
-            '<div class="loading-text" style="color:#e74c3c;">فشل الاتصال بالسيرفر.</div>';
-    }
-}
-
-// 🔐 تسجيل الدخول
-async function showLoginPrompt() {
-    const username = prompt("معرف المطور:");
-    if (!username) return;
-
-    const pass_code = prompt("شفرة الوصول:");
-    if (!pass_code) return;
-
-    try {
-        await apiFetch("/api/login", {
-            method: "POST",
-            body: JSON.stringify({ username, pass_code })
-        });
-
-        localStorage.setItem('grosmen_dev', username);
-        location.reload();
-
-    } catch {
-        alert("بيانات الدخول غير صحيحة أو فشل الاتصال.");
-    }
-}
-
-// 📝 نشر خبر
-async function publishNews() {
-    const title = document.getElementById('newsTitle').value;
-    const content = document.getElementById('newsContent').value;
-    const image_url = document.getElementById('newsImage').value;
-    const author = localStorage.getItem('grosmen_dev');
-
-    if (!title || !content) return alert("املأ الفراغات!");
-
-    try {
-        await apiFetch("/api/news/add", {
-            method: "POST",
-            body: JSON.stringify({ title, content, image_url, author })
-        });
-
-        location.reload();
-
-    } catch {
-        alert("فشل النشر.");
-    }
-}
-
-// 🗑️ حذف خبر
-async function deleteNews(id) {
-    if (!confirm("حذف نهائي؟")) return;
-
-    try {
-        await apiFetch("/api/news/delete", {
-            method: "DELETE",
-            body: JSON.stringify({ id })
-        });
-
-        location.reload();
-
-    } catch {
-        alert("فشل الحذف.");
-    }
-}
-
-// 👑 حالة المطور
-function checkDevStatus() {
-    if (localStorage.getItem('grosmen_dev')) {
-        document.getElementById('devPanel').style.display = 'block';
-        document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
-    }
-}
-
-function logout() {
-    localStorage.removeItem('grosmen_dev');
-    location.reload();
-}
-
-fetchNews();
+}).mount("#app");
 </script>
-     
+
 </body>
 </html>
