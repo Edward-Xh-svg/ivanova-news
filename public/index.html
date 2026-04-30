@@ -96,115 +96,156 @@
         <div class="secret-icon" onclick="showLoginPrompt()">⚡</div>
     </footer>
 
-    <script>
-        const WORKER_URL = "https://ivanova-news-api.vladimirachraf3.workers.dev/";
+       <script>
+const WORKER_URL = "https://ivanova-news-api.vladimirachraf3.workers.dev";
 
-        function toggleAppsMenu() { document.getElementById('appsDropdown').classList.toggle('active'); }
-        window.onclick = function(event) {
-            if (!event.target.matches('.apps-menu-btn') && !event.target.closest('.apps-dropdown')) {
-                document.getElementById('appsDropdown').classList.remove('active');
+function toggleAppsMenu() {
+    document.getElementById('appsDropdown').classList.toggle('active');
+}
+
+window.onclick = function(event) {
+    if (!event.target.matches('.apps-menu-btn') && !event.target.closest('.apps-dropdown')) {
+        document.getElementById('appsDropdown').classList.remove('active');
+    }
+}
+
+// 🧠 دالة موحدة للطلبات
+async function apiFetch(path, options = {}) {
+    try {
+        const res = await fetch(`${WORKER_URL}${path}`, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options.headers || {})
             }
+        });
+
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text}`);
         }
 
-        async function fetchNews() {
-            try {
-                const res = await fetch(`${WORKER_URL}/api/news`);
-                const data = await res.json();
-                const feed = document.getElementById('newsFeed');
-                feed.innerHTML = data.length ? '' : '<div class="loading-text">لا توجد إصدارات حالية من Manlines.</div>';
-                
-                data.forEach(item => {
-                    feed.innerHTML += `
-                        <div class="news-card">
-                            <button class="delete-btn" onclick="deleteNews(${item.id})"><i class="fa-solid fa-trash"></i> حذف</button>
-                            ${item.image_url ? `<img src="${item.image_url}" onerror="this.style.display='none'">` : ''}
-                            <h2>${item.title}</h2>
-                            <p>${item.content}</p>
-                            <div class="news-meta">
-                                <i class="fa-solid fa-user-pen"></i> المحرر: ${item.author_name} &nbsp;|&nbsp; 
-                                <i class="fa-regular fa-clock"></i> ${new Date(item.created_at).toLocaleString('ar-MA')}
-                            </div>
-                        </div>
-                    `;
-                });
-                checkDevStatus();
-            } catch (e) {
-                document.getElementById('newsFeed').innerHTML = '<div class="loading-text" style="color:#e74c3c;">خطأ في جلب البيانات من المورد.</div>';
-            }
-        }
+        return await res.json();
 
-        async function showLoginPrompt() {
-            const username = prompt("معرف المطور:");
-            if (!username) return;
-            const pass_code = prompt("شفرة الوصول (المسافات حساسة):");
-            if (!pass_code) return;
-            
-            try {
-                const res = await fetch(`${WORKER_URL}/api/login`, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, pass_code })
-                });
+    } catch (err) {
+        console.error("API Error:", err);
+        throw err;
+    }
+}
 
-                if (res.ok) {
-                    localStorage.setItem('grosmen_dev', username);
-                    location.reload();
-                } else {
-                    alert("بيانات الدخول غير صحيحة.");
-                }
-            } catch (e) {
-                alert("فشل في تجاوز جدار حماية البوابة (CORS Error). تأكد من تحديث الـ Worker.");
-            }
-        }
+// 📥 جلب الأخبار
+async function fetchNews() {
+    try {
+        const data = await apiFetch("/api/news");
 
-        async function publishNews() {
-            const title = document.getElementById('newsTitle').value;
-            const content = document.getElementById('newsContent').value;
-            const image_url = document.getElementById('newsImage').value;
-            const author = localStorage.getItem('grosmen_dev');
+        const feed = document.getElementById('newsFeed');
+        feed.innerHTML = data.length 
+            ? '' 
+            : '<div class="loading-text">لا توجد أخبار حالياً.</div>';
 
-            if (!title || !content) return alert("املأ الفراغات!");
+        data.forEach(item => {
+            feed.innerHTML += `
+                <div class="news-card">
+                    <button class="delete-btn" onclick="deleteNews(${item.id})">
+                        <i class="fa-solid fa-trash"></i> حذف
+                    </button>
+                    ${item.image_url ? `<img src="${item.image_url}" onerror="this.style.display='none'">` : ''}
+                    <h2>${item.title}</h2>
+                    <p>${item.content}</p>
+                    <div class="news-meta">
+                        <i class="fa-solid fa-user-pen"></i> ${item.author_name}
+                        &nbsp;|&nbsp;
+                        <i class="fa-regular fa-clock"></i> 
+                        ${new Date(item.created_at).toLocaleString('ar-MA')}
+                    </div>
+                </div>
+            `;
+        });
 
-            try {
-                await fetch(`${WORKER_URL}/api/news/add`, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, content, image_url, author })
-                });
-                location.reload();
-            } catch (e) {
-                alert("خطأ أثناء النشر.");
-            }
-        }
+        checkDevStatus();
 
-        async function deleteNews(id) {
-            if(confirm("حذف نهائي؟")) {
-                try {
-                    await fetch(`${WORKER_URL}/api/news/delete`, {
-                        method: 'DELETE',
-                        mode: 'cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id })
-                    });
-                    location.reload();
-                } catch (e) {
-                    alert("خطأ أثناء الحذف.");
-                }
-            }
-        }
+    } catch (e) {
+        document.getElementById('newsFeed').innerHTML =
+            '<div class="loading-text" style="color:#e74c3c;">فشل الاتصال بالسيرفر.</div>';
+    }
+}
 
-        function checkDevStatus() {
-            if (localStorage.getItem('grosmen_dev')) {
-                document.getElementById('devPanel').style.display = 'block';
-                document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
-            }
-        }
+// 🔐 تسجيل الدخول
+async function showLoginPrompt() {
+    const username = prompt("معرف المطور:");
+    if (!username) return;
 
-        function logout() { localStorage.removeItem('grosmen_dev'); location.reload(); }
+    const pass_code = prompt("شفرة الوصول:");
+    if (!pass_code) return;
 
-        fetchNews();
-    </script>
+    try {
+        await apiFetch("/api/login", {
+            method: "POST",
+            body: JSON.stringify({ username, pass_code })
+        });
+
+        localStorage.setItem('grosmen_dev', username);
+        location.reload();
+
+    } catch {
+        alert("بيانات الدخول غير صحيحة أو فشل الاتصال.");
+    }
+}
+
+// 📝 نشر خبر
+async function publishNews() {
+    const title = document.getElementById('newsTitle').value;
+    const content = document.getElementById('newsContent').value;
+    const image_url = document.getElementById('newsImage').value;
+    const author = localStorage.getItem('grosmen_dev');
+
+    if (!title || !content) return alert("املأ الفراغات!");
+
+    try {
+        await apiFetch("/api/news/add", {
+            method: "POST",
+            body: JSON.stringify({ title, content, image_url, author })
+        });
+
+        location.reload();
+
+    } catch {
+        alert("فشل النشر.");
+    }
+}
+
+// 🗑️ حذف خبر
+async function deleteNews(id) {
+    if (!confirm("حذف نهائي؟")) return;
+
+    try {
+        await apiFetch("/api/news/delete", {
+            method: "DELETE",
+            body: JSON.stringify({ id })
+        });
+
+        location.reload();
+
+    } catch {
+        alert("فشل الحذف.");
+    }
+}
+
+// 👑 حالة المطور
+function checkDevStatus() {
+    if (localStorage.getItem('grosmen_dev')) {
+        document.getElementById('devPanel').style.display = 'block';
+        document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('grosmen_dev');
+    location.reload();
+}
+
+fetchNews();
+</script>
+     
 </body>
 </html>
