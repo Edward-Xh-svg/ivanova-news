@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Grosmen News | الاخبار الدولية</title>
 
 <link rel="icon" href="news-faivcon.png">
@@ -17,17 +18,10 @@ body{
   font-family:'Cairo',sans-serif;
   background:#050505;
   color:white;
-  display:flex;
-  flex-direction:column;
   min-height:100vh;
 }
 
-.glass-effect{
-  background:rgba(255,255,255,0.03);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(255,255,255,0.05);
-}
-
+/* HEADER */
 .main-header{
   display:flex;
   justify-content:space-between;
@@ -35,53 +29,102 @@ body{
   padding:15px 30px;
   position:sticky;
   top:0;
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(10px);
   z-index:1000;
 }
 
-.header-logo{width:150px}
+.header-logo{
+  width:150px;
+}
 
-/* News */
+/* APPS MENU */
+.apps-menu-btn{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4px;
+  cursor:pointer;
+  padding:10px;
+}
+
+.dot{
+  width:5px;
+  height:5px;
+  background:white;
+  border-radius:50%;
+}
+
+.apps-dropdown{
+  position:absolute;
+  top:70px;
+  left:20px;
+  background:#0a0a0a;
+  border:1px solid #222;
+  border-radius:15px;
+  padding:20px;
+  display:none;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.apps-dropdown.active{
+  display:grid;
+}
+
+.app-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  color:white;
+  text-decoration:none;
+  font-size:12px;
+}
+
+.app-item img{
+  width:50px;
+  height:50px;
+}
+
+/* MAIN */
 .news-container{
   max-width:800px;
   margin:40px auto;
   padding:0 20px;
 }
 
+/* NEWS */
 .news-card{
-  background:rgba(255,255,255,0.02);
+  background:#0c0c0c;
   padding:20px;
   margin-bottom:20px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,0.05);
+  border:1px solid #222;
 }
 
 .news-card img{
   max-width:100%;
   border-radius:10px;
-  margin-bottom:10px;
 }
 
-/* Dev */
+/* DEV */
 .dev-tools{
-  display:block;
-  background:#0a0a0a;
+  background:#111;
   padding:20px;
   border-radius:12px;
   margin-bottom:20px;
-  border:1px solid #222;
 }
 
 input,textarea{
   width:100%;
-  margin-bottom:10px;
   padding:10px;
+  margin-bottom:10px;
   background:#000;
   border:1px solid #333;
   color:white;
   border-radius:8px;
 }
 
-/* Login */
+/* LOGIN */
 .login-overlay{
   position:fixed;
   inset:0;
@@ -99,18 +142,15 @@ input,textarea{
   padding:25px;
   border-radius:15px;
   border:1px solid #333;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
 }
 
 button{
   padding:10px;
+  background:#e74c3c;
   border:none;
+  color:white;
   border-radius:8px;
   cursor:pointer;
-  background:#e74c3c;
-  color:white;
 }
 </style>
 
@@ -121,37 +161,64 @@ button{
 <div id="app">
 
 <!-- HEADER -->
-<header class="main-header glass-effect">
-  <img class="header-logo" src="grosmen-fivcon.png">
+<header class="main-header">
 
-  <button v-if="!dev" @click="login.show=true">
-    دخول
-  </button>
+<!-- APPS -->
+<div class="apps-menu-btn" onclick="toggleAppsMenu()">
+  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+</div>
 
-  <button v-else @click="logout">
-    خروج
-  </button>
+<img class="header-logo" src="grosmen-fivcon.png">
+
+<button v-if="!dev" @click="login.show=true">دخول</button>
+<button v-else @click="logout">خروج</button>
+
 </header>
+
+<!-- APPS DROPDOWN -->
+<div class="apps-dropdown" id="appsDropdown">
+  <a class="app-item" href="https://bacmaroc.ivanova.sbs">
+    <img src="bacmaroc-ovcon.png"><span>Bac Maroc</span>
+  </a>
+
+  <a class="app-item" href="https://courses.ivanova.sbs">
+    <img src="courses-ovcon.png"><span>Courses</span>
+  </a>
+
+  <a class="app-item" href="https://wikijobs.ivanova.sbs">
+    <img src="wikijobs-ovcon.png"><span>WikiJobs</span>
+  </a>
+
+  <a class="app-item" href="https://store.ivanova.sbs">
+    <img src="store-ovcon.png"><span>Store</span>
+  </a>
+
+  <a class="app-item">
+    <img src="news-ovcon.png"><span>News</span>
+  </a>
+</div>
 
 <!-- LOGIN -->
 <div v-if="login.show" class="login-overlay">
   <div class="login-box">
-    <h3>تسجيل دخول المطور</h3>
+    <h3>تسجيل دخول</h3>
 
     <input v-model="login.username" placeholder="username">
-    <input v-model="login.pass_code" placeholder="password" type="password">
+    <input v-model="login.pass_code" type="password" placeholder="password">
 
-    <p style="color:#ff5555" v-if="login.error">{{login.error}}</p>
+    <p style="color:red" v-if="login.error">{{login.error}}</p>
 
     <button @click="doLogin">دخول</button>
-    <button @click="login.show=false" style="background:#333">إغلاق</button>
+    <button @click="login.show=false" style="background:#333;margin-top:10px">إغلاق</button>
   </div>
 </div>
 
 <!-- MAIN -->
 <main class="news-container">
 
-<!-- DEV PANEL -->
+<!-- DEV -->
 <div v-if="dev" class="dev-tools">
   <h3>لوحة التحرير</h3>
 
@@ -169,12 +236,9 @@ button{
   <img v-if="n.image_url" :src="n.image_url">
   <h2>{{n.title}}</h2>
   <p>{{n.content}}</p>
+  <small>{{n.author_name}}</small>
 
-  <small>✍ {{n.author_name}}</small>
-
-  <button v-if="dev" @click="remove(n.id)">
-    حذف
-  </button>
+  <button v-if="dev" @click="remove(n.id)">حذف</button>
 </div>
 
 </main>
@@ -214,17 +278,12 @@ async api(path,options={}){
     headers:{"Content-Type":"application/json"},
     ...options
   });
-
   if(!r.ok) throw new Error();
   return await r.json();
 },
 
 async fetchNews(){
-  try{
-    this.news = await this.api("/api/news");
-  }catch(e){
-    console.log(e);
-  }
+  this.news = await this.api("/api/news");
   this.loading=false;
 },
 
@@ -278,6 +337,17 @@ async remove(id){
 }
 
 }).mount("#app");
+
+/* APPS MENU */
+function toggleAppsMenu(){
+  document.getElementById("appsDropdown").classList.toggle("active");
+}
+
+window.onclick=function(e){
+  if(!e.target.closest(".apps-menu-btn") && !e.target.closest(".apps-dropdown")){
+    document.getElementById("appsDropdown").classList.remove("active");
+  }
+}
 </script>
 
 </body>
